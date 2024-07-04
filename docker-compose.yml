@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+  parser:
+    build:
+      context: ./parser
+      dockerfile: Dockerfile
+    depends_on:
+      - mongodb
+    networks:
+      - parser
+    environment:
+      MONGO_URI: mongodb://mongodb:27017/logs
+    volumes:
+      - /var/log:/var/log
+  mongodb:
+    image: mongo
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - parser
+
+  siteforlogs:
+    build:
+      context: ./siteforlogs
+      dockerfile: Dockerfile
+    ports:
+        - "8080:8080"
+    depends_on:
+      - mongodb
+    networks:
+      - parser
+    environment:
+      MONGO_URI: mongodb://mongodb:27017/logs
+
+volumes:
+  mongo-data:
+
+networks:
+  parser:
